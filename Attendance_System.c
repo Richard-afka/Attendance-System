@@ -1,4 +1,4 @@
-#include "Attendance System.h"
+#include "Attendance_System.h"
 
 // Student student[STUDENT_MAX];  // 学生基本信息结构体数组
 // Attend attend[ATTEND_MAX];     //考勤信息结构体数组
