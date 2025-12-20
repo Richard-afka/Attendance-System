@@ -94,7 +94,7 @@ void loaddata(){
         char line_att[100];
         fgets(line_att, sizeof(line_att), fp_att);
         for (int i = 0; attend_num < ATTEND_MAX; i++) {
-            if (fscanf(fp_att, "%d\t%d\t%s\t\t%d\t%s", &attend[i].attend_id,
+            if (fscanf(fp_att, "%d\t\t%d\t%s\t\t%d\t%s", &attend[i].attend_id,
                        &attend[i].id, attend[i].subject, &attend[i].mode,
                        attend[i].date) == 5) {
                 count_att++;
@@ -129,7 +129,7 @@ void savedata(){
     }
     fprintf(fp_att, "记录id\t学号\t课程\t\t考勤状态\t日期\n");
     for (int i = 0; i < attend_num; i++) {
-        fprintf(fp_att, "%d\t", attend[i].attend_id);
+        fprintf(fp_att, "%d\t\t", attend[i].attend_id);
         fprintf(fp_att, "%d\t", attend[i].id);
         fprintf(fp_att, "%s\t\t", attend[i].subject);
         fprintf(fp_att, "%d\t", attend[i].mode);
