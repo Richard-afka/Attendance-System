@@ -140,76 +140,71 @@ void savedata(){
 }
 
 void count_attend() {
-	int present = 0, absent = 0, late = 0, leave = 0;
+	int i;
+	int chuqin = 0, qingjia = 0, queqin = 0, chidao = 0;
 	
-	for (int i = 0; i < attend_count; i++) {
-		if (strcmp(attends[i].status, "出勤") == 0) {
-			present++;
-		} else if (strcmp(attends[i].status, "缺勤") == 0) {
-			absent++;
-		} else if (strcmp(attends[i].status, "迟到") == 0) {
-			late++;
-		} else if (strcmp(attends[i].status, "请假") == 0) {
-			leave++;
+	if (attend_num == 0) {
+		printf("暂无考勤记录！\n");
+		return;
+	}
+	
+	for (i = 0; i < attend_num; i++) {
+		switch (attend[i].mode) {
+			case 1: chuqin++; break;
+			case 2: queqin++; break;
+			case 3: chidao++; break;
+			case 4: qingjia++; break;
 		}
 	}
-
-	printf("总记录数：%d\n", attend_count);
-	printf("出勤：%d\n", present);
-	printf("请假：%d\n", leave);
-	printf("缺勤：%d\n", absent);
-	printf("迟到：%d\n", late);
 	
-	if (attend_count > 0) {
-		float attendance_rate = ((float)present / attend_count) * 100;
-		printf("出勤率：%.2f%%\n", attendance_rate);
-	} else {
-		printf("没有考勤记录。\n");
-	}
+	printf("总记录数：%d\n", attend_num);
+	printf("出勤：%d\n", chuqin);
+	printf("缺勤：%d\n", queqin);
+	printf("迟到：%d\n", chidao);
+	printf("请假：%d\n", qingjia);
+	
+	printf("出勤率：%.2f%%\n", (float)chuqin / attend_num * 100);
 }
 
-
-void revise_attend() {
-
-	printf("选择要修改的记录编号：\n");
-	for (int i = 0; i < attend_count; i++) {
-		printf("%d. 学号：%s 日期：%s 课程：%s 状态：%s\n", 
-			   i + 1, attends[i].stu_id, 
-			   attends[i].date, 
-			   attends[i].course, 
-			   attends[i].status);
-	}
+void revise() {
+	int id, i;
+	int found = 0;
 	
-	int record_index;
+	if (attend_num == 0) {
+		printf("暂无考勤记录，无法修改！\n");
+		return;
+	}
+
+	view_attend();
+
 	printf("请输入要修改的记录编号：");
-	scanf("%d", &record_index);
+	scanf("%d", &id);
 
-	if (record_index < 1 || record_index > attend_count) {
-		printf("无效的记录编号。\n");
-		return;
+	for (i = 0; i < attend_num; i++) {
+		if (attend[i].attend_id == id) {
+			found = 1;
+			
+			printf("请输入新的学号：");
+			scanf("%d", &attend[i].id);
+			
+			printf("请输入新的课程：");
+			scanf("%s", attend[i].subject);
+			
+			printf("请输入新的日期(如 2025-12-12)：");
+			scanf("%s", attend[i].date);
+			
+			printf("请输入新的考勤状态(1出勤 2缺勤 3迟到 4请假)：");
+			scanf("%d", &attend[i].mode);
+			
+			printf("修改成功！\n");
+			break;
+		}
 	}
 	
-
-	Attendance *record = &attends[record_index - 1];
-
-	printf("请输入新的考勤状态：\n");
-	printf("1. 出勤\n2. 缺勤\n3. 迟到\n4. 请假\n");
-	int new_status;
-	scanf("%d", &new_status);
-
-	switch (new_status) {
-		case 1: strcpy(record->status, "出勤"); break;
-		case 2: strcpy(record->status, "缺勤"); break;
-		case 3: strcpy(record->status, "迟到"); break;
-		case 4: strcpy(record->status, "请假"); break;
-	default:
-		printf("无效的状态。\n");
-		return;
+	if (!found) {
+		printf("未找到该记录编号！\n");
 	}
-	
-	printf("考勤记录修改成功！\n");
+	count_attend();
 }
-
-
 
 
