@@ -178,15 +178,21 @@ void revise() {
 	view_attend();
 
 	printf("请输入要修改的记录编号：");
-	scanf("%d", &id);
+	scanf("%d",&id);
+		while(1){
+			if(id>attend_num){printf("该学生不存在！\n请重新输入：\n");
+			scanf("%d", &id);
+		}
+			else break;}
+			
 
 	for (i = 0; i < attend_num; i++) {
 		if (attend[i].attend_id == id) {
 			found = 1;
 			
 			printf("请输入新的学号：");
-			scanf("%d", &attend[i].id);
-			
+			scanf("%s", &attend[i].id);
+
 			printf("请输入新的课程：");
 			scanf("%s", attend[i].subject);
 			
@@ -194,7 +200,22 @@ void revise() {
 			scanf("%s", attend[i].date);
 			
 			printf("请输入新的考勤状态(1出勤 2缺勤 3迟到 4请假)：");
-			scanf("%d", &attend[i].mode);
+			int a;
+			int old_mode=attend[i].mode;
+			scanf("%d", &a);
+			while(1){
+				if(a<1||a>4){printf("请输入正确数字：");
+				scanf("%d", &a);
+			}
+				else{   
+					attend[i].mode=a;
+			     		break;
+			    }
+			     	}
+			if((old_mode==1||old_mode==3)&&(a==2||a==4)){
+				student[i].count--;}
+			else if((old_mode==2||old_mode==4)&&(a==1||a==3)){
+				student[i].count++;}
 			
 			printf("修改成功！\n");
 			break;
