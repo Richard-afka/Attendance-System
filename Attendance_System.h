@@ -12,7 +12,7 @@ int attend_num;
 int student_num;  // 全局变量，分别是但前考勤记录条数和学生人数
 
 void add_student();
-void delect_student();
+void delete_student();
 void search_student();
 void list_student();
 void record_attend();
