@@ -333,3 +333,97 @@ void savedata(){
     fclose(fp_stu);
     fclose(fp_att);
 }
+
+void count_attend() {
+	int i;
+	int chuqin = 0, qingjia = 0, queqin = 0, chidao = 0;
+	
+	if (attend_num == 0) {
+		printf("暂无考勤记录！\n");
+		return;
+	}
+	
+	for (i = 0; i < attend_num; i++) {
+		switch (attend[i].mode) {
+			case 1: chuqin++; break;
+			case 2: queqin++; break;
+			case 3: chidao++; break;
+			case 4: qingjia++; break;
+		}
+	}
+	
+	printf("总记录数：%d\n", attend_num);
+	printf("出勤：%d\n", chuqin);
+	printf("缺勤：%d\n", queqin);
+	printf("迟到：%d\n", chidao);
+	printf("请假：%d\n", qingjia);
+	
+	printf("出勤率：%.2f%%\n", (float)chuqin / attend_num * 100);
+}
+
+void revise() {
+    int id, i, j;
+    int found = 0;
+    int record_index = -1;
+
+    if (attend_num == 0) {
+        printf("暂无考勤记录，无法修改！\n");
+        return;
+    }
+
+    view_attend();
+
+    printf("请输入要修改的记录编号：");
+    scanf("%d", &id);
+
+    for (i = 0; i < attend_num; i++) {
+        if (attend[i].attend_id == id) {
+            found = 1;
+            record_index = i;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("未找到记录编号 %d！\n", id);
+        return;
+    }
+
+    int old_id = attend[record_index].id;
+    int old_mode = attend[record_index].mode;
+
+    printf("请输入新的学号：");
+    int new_id;
+    scanf("%d", &new_id);
+
+    int stu_idx = -1;
+    for (j = 0; j < student_num; j++) {
+        if (student[j].id == new_id) {
+            stu_idx = j;
+            break;
+        }
+    }
+    if (stu_idx == -1) {
+        printf("学号 %d 不存在！\n", new_id);
+        return;
+    }
+    attend[record_index].id = new_id;
+
+    printf("请输入新的课程：");
+    scanf("%s", attend[record_index].subject);
+
+    printf("请输入新的日期(如 2025-12-12)：");
+    scanf("%s", attend[record_index].date);
+     
+    printf("请输入新的考勤状态(1出勤 2缺勤 3迟到 4请假)：");
+    int new_mode;
+    scanf("%d", &new_mode);
+    while (new_mode < 1 || new_mode > 4) {
+        printf("输入无效，请输入1-4之间的数字：");
+        scanf("%d", &new_mode);
+    }
+    attend[record_index].mode = new_mode;
+
+    printf("修改成功！\n");
+    count_attend();  
+}
