@@ -251,6 +251,9 @@ void delete_student() {
             attend[i] = attend[i + 1];
         }
         attend_num--;
+        for (int i = 0; i < attend_num; i++) {
+            attend[i].attend_id = i + 1;  // ID从1开始
+        }
         printf("考勤记录删除成功！剩余考勤记录数：%d\n", attend_num);
 
     } else {
