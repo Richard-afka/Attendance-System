@@ -1,8 +1,69 @@
 #include "Attendance_System.h"
 
-// Student student[STUDENT_MAX];  // 学生基本信息结构体数组
-// Attend attend[ATTEND_MAX];     //考勤信息结构体数组
+ Student student[STUDENT_MAX];  // 学生基本信息结构体数组
+ Attend attend[ATTEND_MAX];     //考勤信息结构体数组
 int attend_num=0, student_num=0;   //全局变量，分别是但前考勤记录条数和学生人数
+
+void search_student()
+{
+    printf("=== 菜单 ===\n");
+    printf("1. 按学号查询\n");
+    printf("2. 按姓名查询\n");
+    int option;
+    scanf("%d", &option);
+    switch (option)
+    {
+    case 1:
+    {
+        int id;
+        printf("请输入学号：\n");
+        scanf("%d", &id);
+        int index=0;
+        for (int i = 0; i < student_num; i++)
+        {
+            if (student[i].id == id)
+            {
+                index=1;
+                printf("学号:%d\n姓名:%s\n班级:%s\n性别:%s\n", student[i].id, student[i].name, student[i].classes,student[i].sex);
+            }
+        }
+        if(index==0){
+            printf("未找到该学生！\n");
+        }
+        break;
+    }
+    case 2:
+    {
+        char name[15];
+        printf("请输入姓名：\n");
+        scanf("%s", name);
+        int index=0;
+        for (int i = 0; i < student_num; i++)
+        {
+            if (strcmp(student[i].name, name) == 0)
+            {
+                printf("学号：%d\n姓名：%s\n班级：%s\n性别：%s\n", student[i].id, student[i].name, student[i].classes, student[i].sex);
+                index=1;
+            }
+        }
+        if(index==0){
+            printf("未找到该学生！\n");
+        }
+        break;
+    }
+    default:
+        printf("请输入正确选项！\n");
+        break;
+    }
+}
+    void list_student()
+    {
+        for (int i = 0; i < student_num; i++)
+        {
+            printf("学号：%d\n姓名：%s\n班级：%s\n性别：%s\n", student[i].id, student[i].name, student[i].classes, student[i].sex);
+        }
+        printf("共计%d名学生\n", student_num);
+    }
 
 void menu() {
     printf("=== 菜单 ===\n");
@@ -34,27 +95,35 @@ int main() {
         switch(n){
             case 1:
                 add_student();
+                savedata();
                 break;
             case 2:
-                delect_student();
+                delete_student();
+                savedata();
                 break;
             case 3:
                 search_student();
+                savedata();
                 break;
             case 4:
                 list_student();
+                savedata();
                 break;
             case 5:
                 record_attend();
+                savedata();
                 break;
             case 6:
                 view_attend();
+                savedata();
                 break;
             case 7:
                 count_attend();
+                savedata();
                 break;
             case 8:
                 revise();
+                savedata();
                 break;
             default:
                 printf("请输入正确选项！\n");
@@ -63,6 +132,132 @@ int main() {
     }
     return 0;
 }
+
+
+void add_student() {
+    if (student_num >= STUDENT_MAX) {
+        printf("学生数量已达上限，无法添加！\n");
+        return;
+    }
+
+    int new_id;
+    printf("请输入新学生学号：");
+    scanf("%d", &new_id);
+    getchar();
+
+    for (int i = 0; i < student_num; i++) {
+        if (student[i].id == new_id) {
+            printf("该学号已存在，添加失败！\n");
+            return;
+        }
+    }
+
+    student[student_num].id = new_id;
+    printf("请输入学生姓名：");
+    fgets(student[student_num].name, sizeof(student[student_num].name), stdin);
+    student[student_num].name[strcspn(student[student_num].name, "\n")] = '\0'; 
+
+    printf("请输入学生班级：");
+    fgets(student[student_num].classes, sizeof(student[student_num].classes), stdin);
+    student[student_num].classes[strcspn(student[student_num].classes, "\n")] = '\0';
+
+    printf("请输入学生性别（男/女）：");
+    fgets(student[student_num].sex, sizeof(student[student_num].sex), stdin);
+    student[student_num].sex[strcspn(student[student_num].sex, "\n")] = '\0';
+
+    student_num++;
+    printf("学生添加成功！当前总学生数：%d\n", student_num);
+}
+void delete_student() {  
+    printf("=== 删除选项 ===\n");
+    printf("1. 删除学生（连带其所有考勤记录）\n");
+    printf("2. 删除单条考勤记录\n");
+    printf("请选择：");
+    int opt;
+    scanf("%d", &opt);
+    getchar();
+
+    if (opt == 1) {
+
+        if (student_num == 0) {
+            printf("暂无学生数据，无需删除！\n");
+            return;
+        }
+
+        int del_id;
+        printf("请输入要删除的学生学号：");
+        scanf("%d", &del_id);
+        getchar();
+
+        int index = -1;
+
+        for (int i = 0; i < student_num; i++) {
+            if (student[i].id == del_id) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1) {
+            printf("未找到该学生！\n");
+            return;
+        }
+
+        
+        for (int i = index; i < student_num - 1; i++) {
+            student[i] = student[i + 1];
+        }
+        student_num--;
+        printf("学生删除成功！\n");
+
+       
+        int new_attend_num = 0;
+        for (int i = 0; i < attend_num; i++) {
+            if (attend[i].id != del_id) {
+                attend[new_attend_num++] = attend[i];
+            }
+        }
+        attend_num = new_attend_num;
+        printf("已同步删除该学生的所有考勤记录，剩余考勤记录数：%d\n", attend_num);
+
+    } else if (opt == 2) {
+       
+        if (attend_num == 0) {
+            printf("暂无考勤记录，无需删除！\n");
+            return;
+        }
+
+        int del_attend_id;
+        printf("请输入要删除的考勤记录ID：");
+        scanf("%d", &del_attend_id);
+        getchar();
+
+        int index = -1;
+        
+        for (int i = 0; i < attend_num; i++) {
+            if (attend[i].attend_id == del_attend_id) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1) {
+            printf("未找到该考勤记录！\n");
+            return;
+        }
+
+      
+        for (int i = index; i < attend_num - 1; i++) {
+            attend[i] = attend[i + 1];
+        }
+        attend_num--;
+        printf("考勤记录删除成功！剩余考勤记录数：%d\n", attend_num);
+
+    } else {
+        printf("输入选项错误！\n");
+    }
+}
+
 void loaddata(){
     int count_stu = 0;
     int count_att = 0;
@@ -94,7 +289,7 @@ void loaddata(){
         char line_att[100];
         fgets(line_att, sizeof(line_att), fp_att);
         for (int i = 0; attend_num < ATTEND_MAX; i++) {
-            if (fscanf(fp_att, "%d\t%d\t%s\t\t%d\t%s", &attend[i].attend_id,
+            if (fscanf(fp_att, "%d\t\t%d\t%s\t\t%d\t%s", &attend[i].attend_id,
                        &attend[i].id, attend[i].subject, &attend[i].mode,
                        attend[i].date) == 5) {
                 count_att++;
@@ -129,7 +324,7 @@ void savedata(){
     }
     fprintf(fp_att, "记录id\t学号\t课程\t\t考勤状态\t日期\n");
     for (int i = 0; i < attend_num; i++) {
-        fprintf(fp_att, "%d\t", attend[i].attend_id);
+        fprintf(fp_att, "%d\t\t", attend[i].attend_id);
         fprintf(fp_att, "%d\t", attend[i].id);
         fprintf(fp_att, "%s\t\t", attend[i].subject);
         fprintf(fp_att, "%d\t", attend[i].mode);
@@ -137,7 +332,8 @@ void savedata(){
     }
     fclose(fp_stu);
     fclose(fp_att);
-} void record_attend() {
+}
+void record_attend() {
     if (attend_num >= ATTEND_MAX) {
         printf("考勤记录已达上限！\n");
         return;
@@ -316,4 +512,98 @@ void view_attend() {
     } else {
         printf("\n");
     }
+}
+
+void count_attend() {
+	int i;
+	int chuqin = 0, qingjia = 0, queqin = 0, chidao = 0;
+	
+	if (attend_num == 0) {
+		printf("暂无考勤记录！\n");
+		return;
+	}
+	
+	for (i = 0; i < attend_num; i++) {
+		switch (attend[i].mode) {
+			case 1: chuqin++; break;
+			case 2: queqin++; break;
+			case 3: chidao++; break;
+			case 4: qingjia++; break;
+		}
+	}
+	
+	printf("总记录数：%d\n", attend_num);
+	printf("出勤：%d\n", chuqin);
+	printf("缺勤：%d\n", queqin);
+	printf("迟到：%d\n", chidao);
+	printf("请假：%d\n", qingjia);
+	
+	printf("出勤率：%.2f%%\n", (float)chuqin / attend_num * 100);
+}
+
+void revise() {
+    int id, i, j;
+    int found = 0;
+    int record_index = -1;
+
+    if (attend_num == 0) {
+        printf("暂无考勤记录，无法修改！\n");
+        return;
+    }
+
+    view_attend();
+
+    printf("请输入要修改的记录编号：");
+    scanf("%d", &id);
+
+    for (i = 0; i < attend_num; i++) {
+        if (attend[i].attend_id == id) {
+            found = 1;
+            record_index = i;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("未找到记录编号 %d！\n", id);
+        return;
+    }
+
+    int old_id = attend[record_index].id;
+    int old_mode = attend[record_index].mode;
+
+    printf("请输入新的学号：");
+    int new_id;
+    scanf("%d", &new_id);
+
+    int stu_idx = -1;
+    for (j = 0; j < student_num; j++) {
+        if (student[j].id == new_id) {
+            stu_idx = j;
+            break;
+        }
+    }
+    if (stu_idx == -1) {
+        printf("学号 %d 不存在！\n", new_id);
+        return;
+    }
+    attend[record_index].id = new_id;
+
+    printf("请输入新的课程：");
+    scanf("%s", attend[record_index].subject);
+
+    printf("请输入新的日期(如 2025-12-12)：");
+    scanf("%s", attend[record_index].date);
+     
+    printf("请输入新的考勤状态(1出勤 2缺勤 3迟到 4请假)：");
+    int new_mode;
+    scanf("%d", &new_mode);
+    while (new_mode < 1 || new_mode > 4) {
+        printf("输入无效，请输入1-4之间的数字：");
+        scanf("%d", &new_mode);
+    }
+    attend[record_index].mode = new_mode;
+
+    printf("修改成功！\n");
+    count_attend();  
 }
