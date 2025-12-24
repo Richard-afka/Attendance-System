@@ -34,27 +34,35 @@ int main() {
         switch(n){
             case 1:
                 add_student();
+                savedata();
                 break;
             case 2:
                 delete_student();
+                savedata();
                 break;
             case 3:
                 search_student();
+                savedata();
                 break;
             case 4:
                 list_student();
+                savedata();
                 break;
             case 5:
                 record_attend();
+                savedata();
                 break;
             case 6:
                 view_attend();
+                savedata();
                 break;
             case 7:
                 count_attend();
+                savedata();
                 break;
             case 8:
                 revise();
+                savedata();
                 break;
             default:
                 printf("请输入正确选项！\n");
